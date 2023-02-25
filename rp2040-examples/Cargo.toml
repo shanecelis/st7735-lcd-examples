@@ -17,9 +17,10 @@ defmt-rtt = "0.3.0"
 panic-probe = { version = "0.3.0", features = ["print-defmt"] }
 
 # If you're not going to use a Board Support Package you'll need these:
-rp2040-hal = { git = "https://github.com/rp-rs/rp-hal", branch="main", features=["rt"] }
+rp2040-hal = { git = "https://github.com/rp-rs/rp-hal", branch="main", features=["rt", "critical-section-impl"] }
 rp2040-boot2 = { git = "https://github.com/rp-rs/rp2040-boot2-rs", branch="main" }
 st7735-lcd = "0.8"
+fugit = "0.3.6"
 
 [dependencies.embedded-graphics]
 version = "0.7"

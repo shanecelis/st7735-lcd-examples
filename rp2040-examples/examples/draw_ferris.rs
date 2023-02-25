@@ -20,11 +20,10 @@ use embedded_graphics::image::{Image, ImageRaw, ImageRawLE};
 use embedded_graphics::prelude::*;
 use embedded_graphics::pixelcolor::Rgb565;
 use embedded_hal::digital::v2::OutputPin;
-use embedded_time::fixed_point::FixedPoint;
-use embedded_time::rate::Extensions;
 use rp2040_hal::clocks::Clock;
 use st7735_lcd;
 use st7735_lcd::Orientation;
+use fugit::RateExtU32;
 
 // A shorter alias for the Peripheral Access Crate, which provides low-level
 // register access
@@ -69,7 +68,7 @@ fn main() -> ! {
     .ok()
     .unwrap();
 
-    let mut delay = cortex_m::delay::Delay::new(core.SYST, clocks.system_clock.freq().integer());
+    let mut delay = cortex_m::delay::Delay::new(core.SYST, clocks.system_clock.freq().to_Hz());
 
     // The single-cycle I/O block controls our GPIO pins
     let sio = hal::Sio::new(pac.SIO);
@@ -83,20 +82,25 @@ fn main() -> ! {
     );
 
     // These are implicitly used by the spi driver if they are in the correct mode
-    let _spi_sclk = pins.gpio6.into_mode::<hal::gpio::FunctionSpi>();
-    let _spi_mosi = pins.gpio7.into_mode::<hal::gpio::FunctionSpi>();
-    let _spi_miso = pins.gpio4.into_mode::<hal::gpio::FunctionSpi>();
+    // let _spi_sclk = pins.gpio6.into_mode::<hal::gpio::FunctionSpi>();
+    // let _spi_mosi = pins.gpio7.into_mode::<hal::gpio::FunctionSpi>();
+    // let _spi_miso = pins.gpio4.into_mode::<hal::gpio::FunctionSpi>();
+
+    let _spi_sclk = pins.gpio18.into_mode::<hal::gpio::FunctionSpi>();
+    let _spi_mosi = pins.gpio19.into_mode::<hal::gpio::FunctionSpi>();
+    let _spi_miso = pins.gpio16.into_mode::<hal::gpio::FunctionSpi>();
     let spi = hal::Spi::<_, _, 8>::new(pac.SPI0);
 
-    let mut lcd_led = pins.gpio12.into_push_pull_output();
-    let dc = pins.gpio13.into_push_pull_output();
-    let rst = pins.gpio14.into_push_pull_output();
+    let mut lcd_led = pins.gpio17.into_push_pull_output();
+    let mut led = pins.gpio25.into_push_pull_output();
+    let dc = pins.gpio22.into_push_pull_output();
+    let rst = pins.gpio26.into_push_pull_output();
 
     // Exchange the uninitialised SPI driver for an initialised one
     let spi = spi.init(
         &mut pac.RESETS,
         clocks.peripheral_clock.freq(),
-        16_000_000u32.Hz(),
+        16.MHz(),
         &embedded_hal::spi::MODE_0,
     );
 
@@ -114,10 +118,13 @@ fn main() -> ! {
     let image: Image<_> = Image::new(&image_raw, Point::new(34, 8));
 
     image.draw(&mut disp).unwrap();
+
+    // disp.set_pixel(64, 64, Rgb565::RED.into_storage()).unwrap();
     
     // Wait until the background and image have been rendered otherwise
     // the screen will show random pixels for a brief moment
     lcd_led.set_high().unwrap();
+    led.set_high().unwrap();
 
     loop { continue; }
 }
