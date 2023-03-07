@@ -67,7 +67,8 @@ const BUTTON_DOWN: u8 = 128; // 10000000
 const HEIGHT: i32 = 128;
 
 
-const STEP_SIZE: f32 = 0.045;
+// const STEP_SIZE: f32 = 0.045;
+const STEP_SIZE: f32 = 0.09;
 const FIVE_PI_SQUARED: f32 = 5.0 * (PI * PI);
 
 const FOV: f32 = PI / 2.7; // The player's field of view.
@@ -142,9 +143,9 @@ unsafe fn update(gamepad: u8, disp: &mut impl DrawTarget<Color = Rgb565>) {
         color,
         1))
     .draw(disp);
-    let _ = Circle::new(Point::new(0, 0), 10)
-        .into_styled(PrimitiveStyle::with_stroke(Rgb565::BLACK, 1))
-        .draw(disp);
+    // let _ = Circle::new(Point::new(0, 0), 10)
+    //     .into_styled(PrimitiveStyle::with_stroke(Rgb565::BLACK, 1))
+    //     .draw(disp);
 
         // oval(0, 0, 10, 10);
         // vline(x as i32, 80 - (height / 2), *height as u32);
